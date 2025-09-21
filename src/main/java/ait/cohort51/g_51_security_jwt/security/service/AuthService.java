@@ -24,7 +24,7 @@ public class AuthService {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
-        this.refreshStorage = new HashMap<>();
+        refreshStorage = new HashMap<>();
     }
 
     public TokenResponseDto login(LoginRequestDto loginRequest) {
@@ -48,9 +48,9 @@ public class AuthService {
         if (tokenService.validateRefreshToken(refreshToken)) {
             Claims refreshClaims = tokenService.getRefreshClaims(refreshToken);
             String username = refreshClaims.getSubject();
-            String saveRefreshToken = refreshStorage.get(username);
+            String savedRefreshToken = refreshStorage.get(username);
 
-            if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
+            if (savedRefreshToken != null && savedRefreshToken.equals(refreshToken)) {
                 String accessToken = tokenService.generateAccessToken(username);
                 return new TokenResponseDto(accessToken, refreshToken);
             }
