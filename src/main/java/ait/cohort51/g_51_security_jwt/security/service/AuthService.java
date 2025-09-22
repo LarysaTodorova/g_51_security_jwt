@@ -46,6 +46,7 @@ public class AuthService {
         String refreshToken = tokenService.getTokenFromRequest(request, "Refresh-Token");
 
         if (tokenService.validateRefreshToken(refreshToken)) {
+            // Извлекаем информацию о пользователе из токена
             Claims refreshClaims = tokenService.getRefreshClaims(refreshToken);
             String username = refreshClaims.getSubject();
             String savedRefreshToken = refreshStorage.get(username);
