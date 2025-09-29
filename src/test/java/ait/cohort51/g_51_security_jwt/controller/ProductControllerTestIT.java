@@ -189,7 +189,7 @@ class ProductControllerTestIT {
 
         // выполняем GET-запрос по эндпоинту /products/{id}, подставляя ID продукта
         ResponseEntity<Product> response = restTemplate.exchange(
-                "/products/{id}", HttpMethod.GET, request, Product.class, testProduct.getId()
+                "/products/{id}", HttpMethod.GET, request, Product.class, savedTestProduct.getId()
         );
 
         // проверяем, что сервер вернул статус 200 OK
@@ -223,6 +223,25 @@ class ProductControllerTestIT {
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Unexpected HTTP status");
         assertNull(response.getBody(), "Response body should be null");
+    }
+
+    @Test
+    @Order(6)
+    public void getProductByIdWhileIdNotExists() {
+        headers.add(HttpHeaders.COOKIE, "Access-Token=" + adminAccessToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        Long notExistedId = -1L;
+
+        ResponseEntity<Product> response = restTemplate.exchange(
+                "/products/{id}", HttpMethod.GET, request, Product.class, notExistedId
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Unexpected HTTP status");
+        assertNull(response.getBody(), "Response body should be null");
+
+        userRepository.delete(admin);
+
     }
 
 
