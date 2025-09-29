@@ -176,27 +176,38 @@ class ProductControllerTestIT {
 
     @Test
     @Order(4)
-    public void checkSuccessWhileGettingByIdProductWithAdminAuthorization() {
+    public void checkSuccessWhileGettingProductByIdWithAdminAuthorization() {
 
+        // добавляем cookie с Access-Token администратора в заголовки
         headers.add(HttpHeaders.COOKIE, "Access-Token=" + adminAccessToken);
 
+        // сохраняем тестовый продукт в базу, чтобы у него появился ID
         Product savedTestProduct = productRepository.save(testProduct);
 
+        // создаём HttpEntity только с заголовками (GET-запросы обычно не имеют тела)
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
+        // выполняем GET-запрос по эндпоинту /products/{id}, подставляя ID продукта
         ResponseEntity<Product> response = restTemplate.exchange(
                 "/products/{id}", HttpMethod.GET, request, Product.class, testProduct.getId()
         );
 
+        // проверяем, что сервер вернул статус 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Unexpected HTTP status");
 
+        // получаем продукт из тела ответа
         Product retrievedProduct = response.getBody();
 
+        // проверяем, что продукт не null
         assertNotNull(retrievedProduct, "Saved  product should not be null");
+        // проверяем, что у продукта есть ID
         assertNotNull(retrievedProduct.getId(), "Saved  product ID should not be null");
+        // проверяем, что ID продукта из БД совпадает с ID сохранённого
         assertEquals(savedTestProduct.getId(), retrievedProduct.getId(), "We have no product with such ID");
 
+        // удаляем админа из репозитория (очищаем тестовые данные)
         userRepository.delete(admin);
+        // удаляем продукт из репозитория (очищаем тестовые данные)
         productRepository.delete(retrievedProduct);
     }
 
