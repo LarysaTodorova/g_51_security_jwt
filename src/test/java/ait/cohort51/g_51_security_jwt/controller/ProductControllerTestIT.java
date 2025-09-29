@@ -200,6 +200,20 @@ class ProductControllerTestIT {
         productRepository.delete(retrievedProduct);
     }
 
+    @Test
+    @Order(5)
+    public void checkForbiddenStatusWhileGettingProductByIdWithoutAuthorization() {
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Product> response = restTemplate.exchange(
+                "/products/{id}", HttpMethod.GET, request, Product.class, testProduct.getId()
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Unexpected HTTP status");
+        assertNull(response.getBody(), "Response body should be null");
+    }
+
 
     private Product createTestProduct() {
         Product product = new Product();
