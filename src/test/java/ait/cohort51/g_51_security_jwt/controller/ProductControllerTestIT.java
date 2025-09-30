@@ -200,8 +200,7 @@ class ProductControllerTestIT {
 
         // проверяем, что продукт не null
         assertNotNull(retrievedProduct, "Saved  product should not be null");
-        // проверяем, что у продукта есть ID
-        assertNotNull(retrievedProduct.getId(), "Saved  product ID should not be null");
+
         // проверяем, что ID продукта из БД совпадает с ID сохранённого
         assertEquals(savedTestProduct.getId(), retrievedProduct.getId(), "We have no product with such ID");
 
@@ -215,14 +214,18 @@ class ProductControllerTestIT {
     @Order(5)
     public void checkForbiddenStatusWhileGettingProductByIdWithoutAuthorization() {
 
+        Product savedProduct = productRepository.save(testProduct);
+
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         ResponseEntity<Product> response = restTemplate.exchange(
-                "/products/{id}", HttpMethod.GET, request, Product.class, testProduct.getId()
+                "/products/{id}", HttpMethod.GET, request, Product.class, savedProduct.getId()
         );
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Unexpected HTTP status");
         assertNull(response.getBody(), "Response body should be null");
+
+        productRepository.delete(savedProduct);
     }
 
     @Test
@@ -241,7 +244,6 @@ class ProductControllerTestIT {
         assertNull(response.getBody(), "Response body should be null");
 
         userRepository.delete(admin);
-
     }
 
 
