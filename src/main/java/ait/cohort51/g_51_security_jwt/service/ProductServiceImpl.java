@@ -27,7 +27,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getById(Long id) {
-        return repository.findById(id).orElse(null);
+        Product product = repository.findById(id).orElse(null);
+        if (product == null) {
+            throw new IllegalArgumentException("Product with id: " + id + " does not exist");
+        }
+        return product;
     }
 
     @Override
